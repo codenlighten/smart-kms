@@ -1,0 +1,17 @@
+{
+  "sign_envelope": {
+    "idempotencyKey": "1a8ed5ed-fd82-45a0-8a5a-9ceeb9183176",
+    "schemaVersion": "1.0",
+    "actor": {
+      "did": "did:web:example.org/issuers/T123",
+      "tenant": "T123"
+    },
+    "payload": {
+      "digestHex": "7f83b1657ff1fc53b92dc18148a1d65dfa1350cba0d7055f1b3a2842a8f5f7f7",
+      "keyRef": "alias/bsv/tenant/T123/anchor"
+    },
+    "options": {
+      "receiptOnly": true
+    }
+  }
+}

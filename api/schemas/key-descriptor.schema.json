@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartledger.dev/schemas/key-descriptor.schema.json",
+  "title": "KeyDescriptor",
+  "type": "object",
+  "required": ["kid", "alg", "crv", "prov", "ref", "pub"],
+  "properties": {
+    "kid": { "type": "string", "description": "Key ID (ULID/thumbprint)" },
+    "alg": { "type": "string", "description": "Signing alg hint, e.g., ES256K" },
+    "crv": { "type": "string", "enum": ["secp256k1","P-256","Ed25519","RSA"], "description": "Curve / key type" },
+    "prov": { "type": "string", "enum": ["aws-kms","cloudhsm","device","webauthn","raw"] },
+    "ref": { "type": "string", "description": "Provider reference, e.g., KMS alias or PKCS#11 URI" },
+    "pub": { "type": "string", "description": "Public key (compressed hex or JWK string)" },
+    "paths": { "type": "object", "additionalProperties": true },
+    "attest": { "type": "object", "additionalProperties": true },
+    "labels": { "type": "object", "additionalProperties": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

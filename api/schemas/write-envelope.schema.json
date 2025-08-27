@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartledger.dev/schemas/write-envelope.schema.json",
+  "title": "WriteEnvelope",
+  "type": "object",
+  "required": ["idempotencyKey","schemaVersion","actor","payload"],
+  "properties": {
+    "idempotencyKey": { "type": "string" },
+    "schemaVersion": { "type": "string", "pattern": "^1\\.\d+$" },
+    "actor": {
+      "type": "object",
+      "required": ["tenant"],
+      "properties": {
+        "did": { "type": "string" },
+        "tenant": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "payload": { "type": "object" },
+    "options": {
+      "type": "object",
+      "properties": {
+        "dryRun": { "type": "boolean" },
+        "receiptOnly": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

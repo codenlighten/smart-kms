@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartledger.dev/schemas/sign-result.schema.json",
+  "title": "SignResult",
+  "type": "object",
+  "required": ["der", "kid", "keyRef", "requestId"],
+  "properties": {
+    "der": { "type": "string", "description": "DER-encoded ECDSA signature hex" },
+    "kid": { "type": "string" },
+    "keyRef": { "type": "string" },
+    "requestId": { "type": "string" },
+    "proof": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": false
+}

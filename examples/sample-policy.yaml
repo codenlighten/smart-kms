@@ -1,0 +1,15 @@
+version: 1.0
+name: default-allowlist
+checks:
+  - name: tenant-required
+    when: always
+    rule: actor.tenant != null
+  - name: key-prefix-match
+    when: always
+    rule: payload.keyRef startswith ("alias/bsv/tenant/" + actor.tenant + "/")
+  - name: digest-length
+    when: always
+    rule: len(payload.digestHex) == 64
+effects:
+  onDeny: "BLOCK"
+  onAllow: "SIGN"

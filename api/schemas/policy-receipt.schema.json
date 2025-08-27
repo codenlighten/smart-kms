@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartledger.dev/schemas/policy-receipt.schema.json",
+  "title": "PolicyReceipt",
+  "type": "object",
+  "required": ["schemaVersion","policyVersion","subject","inputs","sig","issuedAt"],
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^1\\.\d+$" },
+    "policyVersion": { "type": "string", "pattern": "^1\\.\d+$" },
+    "subject": {
+      "type": "object",
+      "required": ["type","id"],
+      "properties": {
+        "type": { "type": "string" },
+        "id": { "type": "string" },
+        "links": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["digest"],
+      "properties": {
+        "digest": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+        "payloadHash": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+        "policyCtx": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    },
+    "sig": {
+      "type": "object",
+      "required": ["alg","der","kid","keyRef"],
+      "properties": {
+        "alg": { "type": "string" },
+        "der": { "type": "string" },
+        "kid": { "type": "string" },
+        "keyRef": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "attest": { "type": "object", "additionalProperties": true },
+    "anchors": {
+      "type": "object",
+      "properties": {
+        "merkleRoot": { "type": "string" },
+        "bsvTxId": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "ext": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": false
+}

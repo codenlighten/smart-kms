@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartledger.dev/schemas/sign-request.schema.json",
+  "title": "SignRequest",
+  "type": "object",
+  "required": ["digest", "keyRef"],
+  "properties": {
+    "digest": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$", "description": "sha256 digest hex (32 bytes)" },
+    "keyRef": { "type": "string", "description": "slk://... or KMS alias/ARN" },
+    "alg": { "type": "string", "enum": ["ECDSA_SHA_256"], "default": "ECDSA_SHA_256" },
+    "policyContext": { "type": "object", "additionalProperties": true },
+    "idempotencyKey": { "type": "string" }
+  },
+  "additionalProperties": false
+}
