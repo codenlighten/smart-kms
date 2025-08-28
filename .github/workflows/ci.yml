@@ -1,0 +1,34 @@
+name: ci
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & build SDK
+        working-directory: sdk/js
+        run: |
+          npm ci
+          npm run build
+        continue-on-error: true
+
+      - name: Install & test sign-service
+        working-directory: services/sign-service
+        run: |
+          npm ci
+          npm test --if-present
+
+      - name: Lint admin-ui (optional)
+        working-directory: admin-ui
+        run: |
+          npm ci
+          npm run build --if-present

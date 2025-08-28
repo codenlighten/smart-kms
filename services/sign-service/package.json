@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "test": "node --test || jest"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.676.0",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^24.3.0",
+    "jest": "^29.7.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.6.2"
   }

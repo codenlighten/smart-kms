@@ -1,0 +1,185 @@
+openapi: 3.1.0
+info:
+  title: SmartKMS API
+  version: "1.0.0"
+  description: |
+    Hardware-backed signing (AWS KMS secp256k1) with multi-tenant policies and receipts.
+    Base URL: https://api.smartkms.com/v1
+servers:
+  - url: https://api.smartkms.com/v1
+tags:
+  - name: Public
+  - name: Admin
+
+paths:
+  /health:
+    get:
+      tags: [Public]
+      summary: Service health & basic stats
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  ts: { type: string, format: date-time }
+                  uptime: { type: number }
+                  stats:
+                    type: object
+                    properties:
+                      startTime: { type: number }
+                      requestCount: { type: number }
+                      signatureCount: { type: number }
+                      errorCount: { type: number }
+
+  /sign:
+    post:
+      tags: [Public]
+      summary: Sign a SHA-256 digest with a tenant key
+      description: |
+        `digestHex` must be a 32-byte SHA-256 hex string.
+        `keyRef` can be a KMS KeyId or an alias (e.g., `alias/bsv/tenant/T123/anchor`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idempotencyKey, schemaVersion, actor, payload]
+              properties:
+                idempotencyKey: { type: string }
+                schemaVersion: { type: string, enum: ["1.0"] }
+                actor:
+                  type: object
+                  required: [tenant]
+                  properties:
+                    tenant: { type: string }
+                    did: { type: string }
+                payload:
+                  type: object
+                  required: [digestHex, keyRef]
+                  properties:
+                    digestHex:
+                      type: string
+                      pattern: "^[0-9a-fA-F]{64}$"
+                    keyRef:
+                      type: string
+                options:
+                  type: object
+                  properties:
+                    receiptOnly: { type: boolean, default: false }
+      responses:
+        "200":
+          description: Signature + policy receipt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId: { type: string }
+                  policyReceipt:
+                    type: object
+                    properties:
+                      schemaVersion: { type: string }
+                      policyVersion: { type: string }
+                      subject: { type: object }
+                      inputs:
+                        type: object
+                        properties:
+                          digest: { type: string }
+                          policyCtx:
+                            type: object
+                            properties:
+                              tenant: { type: string }
+                              keyRef: { type: string }
+                      sig:
+                        type: object
+                        properties:
+                          alg: { type: string, example: ES256K }
+                          der: { type: string, description: DER-encoded ECDSA signature (hex) }
+                          kid: { type: string }
+                          keyRef: { type: string }
+                      issuedAt: { type: string, format: date-time }
+                      ext: { type: object }
+                  domainResult: { type: object }
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "429":
+          description: Rate limited
+        "500":
+          description: Server error
+
+  /admin/stats:
+    get:
+      tags: [Admin]
+      summary: Aggregate service statistics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalKeys: { type: number }
+                  signaturesTotal: { type: number }
+                  activeTenants: { type: number }
+                  avgResponseTime: { type: number }
+                  requestCount: { type: number }
+                  errorCount: { type: number }
+                  uptime: { type: number }
+                  requestsPerMin: { type: number }
+                  errorRate: { type: number }
+
+  /admin/keys:
+    get:
+      tags: [Admin]
+      summary: List KMS keys known to the service (by alias)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        alias: { type: string }
+                        keyId: { type: string }
+                        usage: { type: string }
+                        curve: { type: string, example: secp256k1 }
+                        status: { type: string, example: active }
+
+  /keys/{alias}/public:
+    get:
+      tags: [Public]
+      summary: (Optional) Get compressed public key for an alias
+      parameters:
+        - name: alias
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Compressed public key (33-byte hex)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  compressedHex:
+                    type: string
+                    pattern: "^(02|03)[0-9a-fA-F]{64}$"
+        "404":
+          description: Alias not found
