@@ -26,7 +26,7 @@ app.use((req, res, next) => {
   }
 });
 
-const PORT = config.port;
+const PORT = process.env.PORT || 8080;
 const TENANT_ID = config.tenantId;
 const RECEIPTS_TABLE = config.receiptsTable;
 
@@ -40,6 +40,17 @@ const serviceStats = {
   signatureCount: 0,
   errorCount: 0
 };
+
+// Health check endpoints for load balancer
+app.get('/health', (_req, res) => {
+  serviceStats.requestCount++;
+  res.status(200).json({ 
+    status: 'healthy',
+    service: 'smart-kms-sign-service',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor((Date.now() - serviceStats.startTime) / 1000)
+  });
+});
 
 app.get('/v1/health', (_req, res) => {
   serviceStats.requestCount++;
@@ -106,7 +117,81 @@ app.get('/v1/admin/recent-signatures', async (_req, res) => {
   }
 });
 
+// Simplified signing endpoint for easy testing
 app.post('/v1/sign', async (req, res) => {
+  serviceStats.requestCount++;
+  try {
+    const { tenant, keyId, message, algorithm } = req.body;
+    
+    // Validate required fields
+    if (!tenant || !keyId || !message) {
+      serviceStats.errorCount++;
+      return res.status(400).json({ 
+        error: 'missing_required_fields',
+        message: 'tenant, keyId, and message are required' 
+      });
+    }
+
+    // Create digest from message
+    const messageBuffer = Buffer.from(message, 'utf8');
+    const digest = createHash('sha256').update(messageBuffer).digest();
+    const digestHex = digest.toString('hex');
+
+    // Map tenant and keyId to KMS key reference
+    const keyRef = `alias/bsv/tenant/${tenant}/${keyId}`;
+
+    // Sign via KMS with VPC endpoint
+    const { derHex, kid, requestId } = await kms.signDigest({
+      keyRef,
+      digestHex
+    });
+
+    // Create simplified response
+    const response = {
+      success: true,
+      requestId,
+      signature: {
+        algorithm: algorithm || 'ECDSA_SHA_256',
+        der: derHex,
+        kid,
+        keyRef
+      },
+      metadata: {
+        tenant,
+        keyId,
+        messageDigest: digestHex,
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    serviceStats.signatureCount++;
+    res.json(response);
+
+  } catch (err: any) {
+    console.error('Signing error:', err);
+    serviceStats.errorCount++;
+    
+    if (err.name === 'AccessDeniedException') {
+      res.status(403).json({ 
+        error: 'access_denied', 
+        message: 'Not authorized to use this KMS key' 
+      });
+    } else if (err.name === 'NotFoundException') {
+      res.status(404).json({ 
+        error: 'key_not_found', 
+        message: 'KMS key not found' 
+      });
+    } else {
+      res.status(500).json({ 
+        error: 'server_error', 
+        message: err?.message || 'Internal server error' 
+      });
+    }
+  }
+});
+
+// Legacy envelope-style signing endpoint
+app.post('/v1/sign/envelope', async (req, res) => {
   serviceStats.requestCount++;
   try {
     const env = req.body;

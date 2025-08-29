@@ -4,7 +4,14 @@ import { createHash } from "crypto";
 export class KMSProvider {
   private client: KMSClient;
   constructor(region: string) {
-    this.client = new KMSClient({ region });
+    // Use VPC endpoint to avoid public internet timeouts in NAT-less architecture
+    const endpoint = process.env.AWS_ENDPOINT_URL_KMS || 
+      `https://vpce-0b485558f2c45e37b.kms.${region}.vpce.amazonaws.com`;
+    
+    this.client = new KMSClient({ 
+      region,
+      endpoint 
+    });
   }
 
   async signDigest(params: { keyRef: string, digestHex: string }): Promise<{ derHex: string, kid: string, requestId: string }> {

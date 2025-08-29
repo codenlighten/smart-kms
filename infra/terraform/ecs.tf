@@ -123,7 +123,7 @@ resource "aws_ecs_task_definition" "sign_service" {
   container_definitions = jsonencode([
     {
       name  = "sign-service"
-      image = "${aws_ecr_repository.sign_service[0].repository_url}:latest"
+      image = "${aws_ecr_repository.sign_service[0].repository_url}:vpce-fix"
       
       essential = true
       

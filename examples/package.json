@@ -1,0 +1,16 @@
+{
+  "name": "smartkms-integration-demo",
+  "version": "1.0.0",
+  "description": "Demo application showing how to integrate with SmartKMS",
+  "main": "integration-demo.js",
+  "scripts": {
+    "start": "node integration-demo.js",
+    "demo": "node integration-demo.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "keywords": ["smartkms", "aws", "kms", "signing", "blockchain", "bsv"],
+  "author": "Codenlighten, Inc.",
+  "license": "Apache-2.0"
+}

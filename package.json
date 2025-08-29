@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-kms": "^3.876.0",
+    "node-fetch": "^3.3.2"
+  },
+  "name": "aws-kms-scaffold",
+  "version": "1.0.0",
+  "description": "**Production-grade signing platform for BSV and Web3**, powered by AWS KMS (secp256k1), multi-tenant policies, DynamoDB receipts, and a NAT-less ECS Fargate deployment behind an ALB.",
+  "main": "demo-smart-kms.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codenlighten/smart-kms.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codenlighten/smart-kms/issues"
+  },
+  "homepage": "https://github.com/codenlighten/smart-kms#readme"
+}

@@ -60,3 +60,12 @@ private/
 # Build artifacts
 *.tar.gz
 *.zip
+# Additional cleanup patterns
+.cleanup-backup/
+*.backup
+*.old
+
+# Demo credentials (if any accidentally added)
+demo-credentials.json
+test-keys/
+
