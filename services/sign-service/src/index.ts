@@ -7,6 +7,7 @@ import { makePolicyEngine } from './policy/policyEngine.js';
 import { putReceipt, getRecentReceipts } from './receipts/receiptStore.js';
 import { canonicalize } from './util/jcs.js';
 import { config } from './config.js';
+import { apiKeyAuth, requireAdmin, validateTenantAccess } from './middleware/auth.js';
 
 // Validate configuration on startup
 config.validate();
@@ -41,7 +42,7 @@ const serviceStats = {
   errorCount: 0
 };
 
-// Health check endpoints for load balancer
+// Health check endpoints for load balancer (no auth required)
 app.get('/health', (_req, res) => {
   serviceStats.requestCount++;
   res.status(200).json({ 
@@ -62,8 +63,8 @@ app.get('/v1/health', (_req, res) => {
   });
 });
 
-// Admin endpoints
-app.get('/v1/admin/stats', (_req, res) => {
+// Admin endpoints (require authentication and admin permissions)
+app.get('/v1/admin/stats', apiKeyAuth, requireAdmin, (_req, res) => {
   serviceStats.requestCount++;
   const uptime = Date.now() - serviceStats.startTime;
   res.json({
@@ -79,7 +80,7 @@ app.get('/v1/admin/stats', (_req, res) => {
   });
 });
 
-app.get('/v1/admin/keys', async (_req, res) => {
+app.get('/v1/admin/keys', apiKeyAuth, requireAdmin, async (_req, res) => {
   serviceStats.requestCount++;
   try {
     res.json({
@@ -106,7 +107,7 @@ app.get('/v1/admin/keys', async (_req, res) => {
   }
 });
 
-app.get('/v1/admin/recent-signatures', async (_req, res) => {
+app.get('/v1/admin/recent-signatures', apiKeyAuth, requireAdmin, async (_req, res) => {
   serviceStats.requestCount++;
   try {
     const receipts = await getRecentReceipts(RECEIPTS_TABLE, 'TENANT#T123', 10);
@@ -117,8 +118,8 @@ app.get('/v1/admin/recent-signatures', async (_req, res) => {
   }
 });
 
-// Simplified signing endpoint for easy testing
-app.post('/v1/sign', async (req, res) => {
+// Simplified signing endpoint for easy testing (requires authentication and tenant validation)
+app.post('/v1/sign', apiKeyAuth, validateTenantAccess, async (req, res) => {
   serviceStats.requestCount++;
   try {
     const { tenant, keyId, message, algorithm } = req.body;
@@ -190,8 +191,8 @@ app.post('/v1/sign', async (req, res) => {
   }
 });
 
-// Legacy envelope-style signing endpoint
-app.post('/v1/sign/envelope', async (req, res) => {
+// Legacy envelope-style signing endpoint (requires authentication)
+app.post('/v1/sign/envelope', apiKeyAuth, async (req, res) => {
   serviceStats.requestCount++;
   try {
     const env = req.body;

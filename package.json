@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.883.0",
     "@aws-sdk/client-kms": "^3.876.0",
+    "@aws-sdk/lib-dynamodb": "^3.883.0",
     "node-fetch": "^3.3.2"
   },
   "name": "aws-kms-scaffold",

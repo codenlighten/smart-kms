@@ -123,7 +123,7 @@ resource "aws_ecs_task_definition" "sign_service" {
   container_definitions = jsonencode([
     {
       name  = "sign-service"
-      image = "${aws_ecr_repository.sign_service[0].repository_url}:vpce-fix"
+      image = "${aws_ecr_repository.sign_service[0].repository_url}:latest"
       
       essential = true
       
@@ -198,9 +198,9 @@ resource "aws_ecs_service" "sign_service" {
   enable_execute_command = true  # For debugging
 
   network_configuration {
-    subnets          = aws_subnet.private[*].id
+    subnets          = aws_subnet.public[*].id
     security_groups  = [aws_security_group.ecs_tasks[0].id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {

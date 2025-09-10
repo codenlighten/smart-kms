@@ -1,0 +1,65 @@
+{
+    "family": "universal-foundation-PROD-sign-service",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::008971678981:role/universal-foundation-PROD-ecs-execution-role",
+    "taskRoleArn": "arn:aws:iam::008971678981:role/universal-foundation-PROD-ecs-task-role",
+    "containerDefinitions": [
+        {
+            "name": "sign-service",
+            "image": "008971678981.dkr.ecr.us-east-1.amazonaws.com/universal-foundation-prod-sign-service:kms-endpoint-fix",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "TENANT_ID",
+                    "value": "PROD"
+                },
+                {
+                    "name": "AWS_REGION",
+                    "value": "us-east-1"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "RECEIPTS_TABLE",
+                    "value": "receipts"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/universal-foundation-PROD-sign-service",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:8080/v1/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            },
+            "systemControls": []
+        }
+    ]
+}

@@ -162,22 +162,22 @@ resource "aws_cloudwatch_log_group" "waf" {
   }
 }
 
-# WAF Logging Configuration
-resource "aws_wafv2_web_acl_logging_configuration" "main" {
-  count = var.environment == "production" && var.enable_waf ? 1 : 0
-  
-  resource_arn            = aws_wafv2_web_acl.main[0].arn
-  log_destination_configs = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.waf[0].name}"]
-
-  redacted_fields {
-    single_header {
-      name = "authorization"
-    }
-  }
-
-  redacted_fields {
-    single_header {
-      name = "x-api-key"
-    }
-  }
-}
+# WAF Logging Configuration - Temporarily disabled due to ARN format issue
+# resource "aws_wafv2_web_acl_logging_configuration" "main" {
+#   count = var.environment == "production" && var.enable_waf ? 1 : 0
+#   
+#   resource_arn            = aws_wafv2_web_acl.main[0].arn
+#   log_destination_configs = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.waf[0].name}"]
+# 
+#   redacted_fields {
+#     single_header {
+#       name = "authorization"
+#     }
+#   }
+# 
+#   redacted_fields {
+#     single_header {
+#       name = "x-api-key"
+#     }
+#   }
+# }

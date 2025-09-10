@@ -6,7 +6,7 @@ export class KMSProvider {
   constructor(region: string) {
     // Use VPC endpoint to avoid public internet timeouts in NAT-less architecture
     const endpoint = process.env.AWS_ENDPOINT_URL_KMS || 
-      `https://vpce-0b485558f2c45e37b.kms.${region}.vpce.amazonaws.com`;
+      `https://vpce-0b485558f2c45e37b-s9pollhu.kms.${region}.vpce.amazonaws.com`;
     
     this.client = new KMSClient({ 
       region,

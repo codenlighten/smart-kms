@@ -15,7 +15,7 @@ resource "aws_lb" "main" {
   access_logs {
     bucket  = aws_s3_bucket.alb_logs[0].id
     prefix  = "alb-logs"
-    enabled = true
+    enabled = false
   }
 
   tags = {

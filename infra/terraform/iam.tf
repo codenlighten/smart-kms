@@ -57,8 +57,13 @@ resource "aws_iam_policy" "signer_policy" {
       },
       {
         Effect   = "Allow",
-        Action   = ["dynamodb:PutItem"],
+        Action   = ["dynamodb:PutItem", "dynamodb:Query", "dynamodb:Scan"],
         Resource = aws_dynamodb_table.receipts.arn
+      },
+      {
+        Effect   = "Allow",
+        Action   = ["dynamodb:GetItem", "dynamodb:Query"],
+        Resource = aws_dynamodb_table.api_keys.arn
       },
       {
         Effect   = "Allow",
