@@ -7,11 +7,12 @@ echo "🔐 Smart KMS Security Verification"
 echo "================================="
 echo ""
 
-# Test credentials
-ADMIN_KEY="__REDACTED_ROTATE_ME__"
-USER_KEY="__REDACTED_ROTATE_ME__"
+# Test credentials — provide via environment, do NOT hardcode.
+#   export ADMIN_KEY=... USER_KEY=... before running.
+ADMIN_KEY="${ADMIN_KEY:?set ADMIN_KEY in the environment}"
+USER_KEY="${USER_KEY:?set USER_KEY in the environment}"
 INVALID_KEY="invalid-key-12345"
-API_BASE="https://api.smartkms.com"
+API_BASE="${API_BASE:-https://api.smartkms.com}"
 
 echo "✅ Test 1: Health endpoints (no auth required)"
 echo "----------------------------------------------"
